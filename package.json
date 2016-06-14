@@ -27,8 +27,7 @@
     "redux": "^3.5.2"
   },
   "dependencies": {
-    "babel-runtime": "6.x.x",
-    "lodash.partial": "^4.1.4"
+    "babel-runtime": "6.x.x"
   },
   "eslintConfig": {
     "parser": "babel-eslint",

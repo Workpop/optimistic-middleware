@@ -63,10 +63,10 @@ type OptimisticActionType = {
 
 Parameters:
 
-`[type] - action type corresponding to reducer state change`
-`[stateKey] - key of reducer related to action`
-`[mutation] - asynchronous function intended to mutate some data on the server`
-`[data] - data needed to change the state in the reducer`
+1. `[type] - action type corresponding to reducer state change`
+2. `[stateKey] - key of reducer related to action`
+3. `[mutation] - asynchronous function intended to mutate some data on the server`
+4. `[data] - data needed to change the state in the reducer`
 
 ## How this works:
 
@@ -86,6 +86,6 @@ If the method returns an error, we append several pieces of meta data with the e
  ```
 If successful, we append `OPTIMISTIC_UPDATE_SUCCESS` and finish the dispatch process.
 
-## Caveat
+## Caveats
 
 Because we are reverting our state when errors occur based on the reducer state, this middleware is confined to the reducer `stateKey` passed into the action. Optimistic Middleware does not currently support updates that affect multiple stateKeys.

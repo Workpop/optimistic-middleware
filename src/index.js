@@ -1,1 +1,3 @@
-export { optimisticMiddleware } from './middleware';
+import optimisticMiddleware from './middleware';
+
+export { optimisticMiddleware };

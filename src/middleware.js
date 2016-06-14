@@ -1,7 +1,7 @@
 const OPTIMISTIC = {
-  START: "OPTIMISTIC_UPDATE_START",
-  ERROR: "OPTIMISTIC_UPDATE_FAILURE",
-  SUCCESS: "OPTIMISTIC_UPDATE_SUCCESS"
+  START: 'OPTIMISTIC_UPDATE_START',
+  ERROR: 'OPTIMISTIC_UPDATE_FAILURE',
+  SUCCESS: 'OPTIMISTIC_UPDATE_SUCCESS',
 };
 
 export default function optimisticMiddleware(store) {
@@ -18,7 +18,7 @@ export default function optimisticMiddleware(store) {
       // apply the optimistic update first. This is described in our reducer for this actionType
       next({
         ...rest,
-        optimisticState: OPTIMISTIC.START
+        optimisticState: OPTIMISTIC.START,
       });
       // next we're going to call our mutation, because we're in a Meteor context, we are expecting a callback with e,r
       return mutation((error) => {
@@ -28,15 +28,15 @@ export default function optimisticMiddleware(store) {
             error: error.reason,
             data: previousState,
             optimisticState: OPTIMISTIC.ERROR,
-            type: action.type
+            type: action.type,
           });
         }
         // apply our update again but this time, change the OPTIMISTIC state
         return next({
           ...rest,
-          optimisticState: OPTIMISTIC.SUCCESS
+          optimisticState: OPTIMISTIC.SUCCESS,
         });
       });
-    }
+    };
   };
 }

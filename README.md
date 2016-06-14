@@ -71,7 +71,9 @@ Parameters:
 ## How this works:
 
 When you dispatch an OptimisticAction, the action is intercepted by Redux middleware. Immediately we save the previous state of the passed in `stateKey` in case our action throws an error. 
+
 We start the dispatch process immediately executing the data change in the action to the reducer. The state is appended with `OPTIMISTIC_UPDATE_START`, to signal the start of our dispatch.
+
 From there, we call our asynchronous method. 
 
 If the method returns an error, we append several pieces of meta data with the error reason and `OPTIMISTIC_UPDATE_FAILURE` (helpful for development).

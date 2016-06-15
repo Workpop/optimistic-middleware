@@ -43,7 +43,7 @@ function optimisticAddTodo(text) {
         type: 'ADD_TODO',
         stateKey: 'todos',
         mutation(cb) {
-            return Meteor.call('addTodo', cb);
+            return Meteor.call('addTodo', text, cb);
         },
         data: text
     }

@@ -6,6 +6,8 @@ Optimistically apply actions that will be reverted on error.
 
 `npm install --save @workpop/optimistic-middleware`
 
+`import { optimisticMiddleware } from '@workpop/optimistic-middleware';`
+
 ## Usage
 
 ### Step 1: Create your Reducer

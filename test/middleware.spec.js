@@ -44,13 +44,13 @@ const rootReducer = combineReducers({
 
 describe('Optimistic Middleware', function () {
   it('should apply the update with an Optimistc flag', function () {
-    const store = createStore(rootReducer, {}, applyMiddleware(optimisticMiddleware));
+    const store = createStore(rootReducer, {}, applyMiddleware(optimisticMiddleware()));
     optimisticUpdate(store);
     expect(store.getState().test.optimisticState).to.eql('OPTIMISTIC_UPDATE_SUCCESS');
     expect(store.getState().test.data).to.eql('FOO');
   });
   it('should should not update state and have a failed optimistic state', function () {
-    const store = createStore(rootReducer, {}, applyMiddleware(optimisticMiddleware));
+    const store = createStore(rootReducer, {}, applyMiddleware(optimisticMiddleware()));
     optimisticFail(store);
     expect(store.getState().test.optimisticState).to.eql('OPTIMISTIC_UPDATE_FAILURE');
     expect(store.getState().test.data).to.eql('BAR');

@@ -23,6 +23,7 @@ export default function optimisticMiddleware() {
         });
         // next we're going to call our mutation, because we're in a Meteor context, we are expecting a callback with e,r
         return mutation((error) => {
+          console.log('CALLING METHOD');
           // if there is an error we need to revert our state back to the initial state before middleware ran
           if (error) {
             return next({
@@ -32,6 +33,7 @@ export default function optimisticMiddleware() {
               type: action.type,
             });
           }
+          console.log('CALLING ABOUT TO NEXT');
           // apply our update again but this time, change the OPTIMISTIC state
           return next({
             optimisticState: OPTIMISTIC.SUCCESS,

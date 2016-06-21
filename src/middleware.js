@@ -1,3 +1,5 @@
+const isFunction = require('lodash.isfunction');
+
 const OPTIMISTIC = {
   START: 'OPTIMISTIC_UPDATE_START',
   ERROR: 'OPTIMISTIC_UPDATE_FAILURE',
@@ -27,7 +29,7 @@ export default function optimisticMiddleware() {
         mutation((error, result) => {
           // if there is an error we need to revert our state back to the initial state before middleware ran
           if (error) {
-            if (_.isFunction(onError)) {
+            if (isFunction(onError)) {
               onError(error);
             }
             return next({
@@ -38,7 +40,7 @@ export default function optimisticMiddleware() {
             });
           }
           // apply our update again but this time, change the OPTIMISTIC state
-          if (_.isFunction(onSuccess)) {
+          if (isFunction(onSuccess)) {
             onSuccess(result);
           }
           return next({

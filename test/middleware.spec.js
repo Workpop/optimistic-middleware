@@ -75,8 +75,8 @@ function testReducer(state = { data: 'BAR' }, action = {}) {
   } else if (type === 'ERROR') {
     return {
       data: 'ERROR',
-      ...rest
-    }
+      ...rest,
+    };
   }
   return state;
 }

@@ -25,7 +25,7 @@ export default function optimisticMiddleware(store) {
         ...rest,
       });
       // next we're going to call our mutation, because we're in a Meteor context, we are expecting a callback with e,r
-      mutation((error, result) => {
+      return mutation((error, result) => {
         // if there is an error we need to revert our state back to the initial state before middleware ran
         if (error) {
           if (isFunction(onError)) {

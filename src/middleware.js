@@ -9,7 +9,7 @@ export default function optimisticMiddleware() {
     return (next) => {
       return (action) => {
         const storeState = store.getState();
-        const { mutation, stateKey, ...rest } = action;
+        const { onSuccess, onError, errorType, mutation, stateKey, data, type, ...rest } = action;
         // get the previous state before we start
         const previousState = storeState && storeState[stateKey] && storeState[stateKey].data;
         // if we don't have a mutation, proceed like normal
@@ -18,26 +18,33 @@ export default function optimisticMiddleware() {
         }
         // apply the optimistic update first. This is described in our reducer for this actionType
         next({
+          type,
+          data,
           optimisticState: OPTIMISTIC.START,
           ...rest,
         });
         // next we're going to call our mutation, because we're in a Meteor context, we are expecting a callback with e,r
-        return mutation((error) => {
-          console.log('CALLING METHOD');
+        mutation((error, result) => {
           // if there is an error we need to revert our state back to the initial state before middleware ran
           if (error) {
+            if (_.isFunction(onError)) {
+              onError(error);
+            }
             return next({
               error: error.reason,
               data: previousState,
               optimisticState: OPTIMISTIC.ERROR,
-              type: action.type,
+              type: errorType || type,
             });
           }
-          console.log('CALLING ABOUT TO NEXT');
           // apply our update again but this time, change the OPTIMISTIC state
+          if (_.isFunction(onSuccess)) {
+            onSuccess(result);
+          }
           return next({
+            type,
             optimisticState: OPTIMISTIC.SUCCESS,
-            ...rest,
+            data,
           });
         });
       };

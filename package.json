@@ -1,6 +1,6 @@
 {
   "name": "@workpop/optimistic-middleware",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Optimistic Methods Middleware for Redux",
   "main": "dist/index.js",
   "scripts": {

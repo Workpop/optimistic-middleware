@@ -24,7 +24,8 @@
     "lodash.partial": "^4.1.4",
     "mocha": "^2.3.3",
     "react-tools": "^0.13.3",
-    "redux": "^3.5.2"
+    "redux": "^3.5.2",
+    "sinon": "^1.17.4"
   },
   "dependencies": {
     "babel-runtime": "6.x.x",

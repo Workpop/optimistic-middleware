@@ -1,6 +1,6 @@
 {
   "name": "@workpop/optimistic-middleware",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Optimistic Methods Middleware for Redux",
   "main": "dist/index.js",
   "scripts": {
@@ -24,10 +24,12 @@
     "lodash.partial": "^4.1.4",
     "mocha": "^2.3.3",
     "react-tools": "^0.13.3",
-    "redux": "^3.5.2"
+    "redux": "^3.5.2",
+    "sinon": "^1.17.4"
   },
   "dependencies": {
-    "babel-runtime": "6.x.x"
+    "babel-runtime": "6.x.x",
+    "lodash.isfunction": "^3.0.8"
   },
   "eslintConfig": {
     "parser": "babel-eslint",

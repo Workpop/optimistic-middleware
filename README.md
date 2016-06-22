@@ -110,7 +110,6 @@ function optimisticAddTodo(text) {
 
 #### Custom onSuccess
 ```js
-
 function someThunk(result) {
     return (dispatch) => {
         someOtherAsync(result,(e, result) => {
@@ -146,7 +145,7 @@ Let's break down our action shape:
 type OptimisticActionType = {
     type: string,
     stateKey: string,
-    mutation: Function,
+    async: Function,
     data: any
 }
 ```
@@ -155,7 +154,7 @@ Parameters:
 
 1. `[type] - action type corresponding to reducer state change`
 2. `[stateKey] - key of reducer related to action`
-3. `[async] - asynchronous function intended to mutate some data on the server`
+3. `[async] - asynchronous function intended to make mutation/remote call to the server`
 4. `[data] - data needed to change the state in the reducer`
 5. `[onSuccess] - function to be called when async function returns *optional`
 6. `[simulate] - function be called to simulate the optimistic update *optional`

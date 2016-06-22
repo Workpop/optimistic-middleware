@@ -39,7 +39,7 @@ function todos(state = {}, action = {}) {
 
 ### Step 2: Build your Action Creator
 
-* Generic Optimistic Action Creator
+* #### Generic Optimistic Action Creator
 ```js
 function optimisticAddTodo(text) {
     return {
@@ -54,7 +54,7 @@ function optimisticAddTodo(text) {
 
 ```
 
-* Functional Simulation
+* #### Functional Simulation
 the simulate function will allow you to customize your simulations.
 
 ```js
@@ -80,7 +80,7 @@ function optimisticAddTodo(text) {
 }
 ```
 
-* Custom Errors
+* #### Custom Errors
 
 ```js
 function optimisticAddTodo(text) {
@@ -108,7 +108,7 @@ function optimisticAddTodo(text) {
 }
 ```
 
-* Custom onSuccess
+* #### Custom onSuccess
 ```js
 
 function someThunk(result) {

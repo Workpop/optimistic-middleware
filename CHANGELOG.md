@@ -1,4 +1,4 @@
-vNEXT
+v1.0.0
 
 Middleware will change quite a bit. Here are the API changes:
 * the middleware accepts a `simulate` function that binds `dispatch` and `data` from the action creator. 

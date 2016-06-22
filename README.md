@@ -39,7 +39,7 @@ function todos(state = {}, action = {}) {
 
 ### Step 2: Build your Action Creator
 
-1. Generic Optimistic Action Creator
+* Generic Optimistic Action Creator
 ```js
 function optimisticAddTodo(text) {
     return {
@@ -54,7 +54,7 @@ function optimisticAddTodo(text) {
 
 ```
 
-2. Functional Simulation
+* Functional Simulation
 the simulate function will allow you to customize your simulations.
 
 ```js
@@ -80,7 +80,7 @@ function optimisticAddTodo(text) {
 }
 ```
 
-3. Custom Errors
+* Custom Errors
 
 ```js
 function optimisticAddTodo(text) {
@@ -108,7 +108,7 @@ function optimisticAddTodo(text) {
 }
 ```
 
-4. Custom onSuccess
+* Custom onSuccess
 ```js
 
 function someThunk(result) {
@@ -157,20 +157,19 @@ Parameters:
 2. `[stateKey] - key of reducer related to action`
 3. `[async] - asynchronous function intended to mutate some data on the server`
 4. `[data] - data needed to change the state in the reducer`
-5. `[onSuccess]` - function to be called when async function returns *optional
-6. `[simulate]` - function be called to simulate the optimistic update
-7. `[onError]` - function to be called when the async function returns an error
+5. `[onSuccess] - function to be called when async function returns *optional`
+6. `[simulate] - function be called to simulate the optimistic update *optional`
+7. `[onError] - function to be called when the async function returns an error *optional`
 
 
 ## How this works:
 
 When you dispatch an OptimisticAction, the action is intercepted by Redux middleware. Immediately we save the previous state of the passed in `stateKey` in case our action throws an error. 
 
-We start the dispatch process immediately executing the data change in the action to the reducer. The state is appended with `OPTIMISTIC_UPDATE_START`, to signal the start of our dispatch.
-
+We start the dispatch process immediately executing the data change in the action to the reducer.
 From there, we call our asynchronous method. 
 
-If the method returns an error, we append several pieces of meta data with the error reason and `OPTIMISTIC_UPDATE_FAILURE` (helpful for development).
+If the method returns an error, we append several pieces of meta data with the error reason.
 
  ```js
  type OptimisticErrorType = {

@@ -6,25 +6,51 @@ const partial = require('lodash.partial');
 
 function optimisticUpdate(store) {
   return store.dispatch({
-    optimistic: true,
-    type: 'UPDATE',
     stateKey: 'test',
     async(cb) {
       return cb();
     },
-    data: 'FOO',
+    simulate: {
+      type: 'UPDATE',
+      data: 'FOO'
+    },
+  });
+}
+
+function optimisticUpdateWithoutStateKey(store) {
+  return store.dispatch({
+    async(cb) {
+      return cb();
+    },
+    simulate: {
+      type: 'UPDATE',
+      data: 'FOO'
+    },
+  });
+}
+
+function optimisticUpdateWithoutOnError(store) {
+  return store.dispatch({
+    async(cb) {
+      return cb();
+    },
+    simulate() {
+      return;
+    },
+    stateKey: 'test',
   });
 }
 
 function optimisticUpdateWithSuccess(store, onSuccess) {
   return store.dispatch({
-    optimistic: true,
-    type: 'UPDATE',
+    simulate: {
+      type: 'UPDATE',
+      data: 'FOO'
+    },
     stateKey: 'test',
     async(cb) {
       return cb();
     },
-    data: 'FOO',
     onSuccess,
   });
 }
@@ -35,8 +61,10 @@ function optimisticFail(store) {
     data: 'BAR',
   });
   return store.dispatch({
-    type: 'UPDATE',
-    optimistic: true,
+    simulate: {
+      type: 'UPDATE',
+      data: 'FOO'
+    },
     stateKey: 'test',
     async(cb) {
       const partialCb = partial(cb, { reason: 'you suck' });
@@ -48,11 +76,11 @@ function optimisticFail(store) {
 
 function optimisticSimulation(store, simulate) {
   return store.dispatch({
-    type: 'UPDATE',
-    data: 'FOO',
-    optimistic: true,
     simulate,
     stateKey: 'test',
+    onError() {
+      return;
+    },
     async(cb) {
       const partialCb = partial(cb, { reason: 'you suck' });
       return partialCb();
@@ -62,14 +90,15 @@ function optimisticSimulation(store, simulate) {
 
 function optimisticFailWithError(store, onError) {
   return store.dispatch({
-    type: 'UPDATE',
+    simulate: {
+      type: 'UPDATE',
+      data: 'FOO'
+    },
     stateKey: 'test',
-    optimistic: true,
     async(cb) {
       const partialCb = partial(cb, { reason: 'you suck' });
       return partialCb();
     },
-    data: 'FOO',
     onError,
   });
 }
@@ -96,6 +125,9 @@ describe('Optimistic Middleware', function () {
     store = createStore(rootReducer, {}, applyMiddleware(optimisticMiddleware));
   });
 
+  it('should throw if no stateKey is passed in', function () {
+    expect(optimisticUpdateWithoutStateKey.bind(store)).to.throw;
+  });
 
   it('should apply the update optimistically', function () {
     optimisticUpdate(store);
@@ -115,6 +147,10 @@ describe('Optimistic Middleware', function () {
     optimisticUpdateWithSuccess(store, onSuccess);
     expect(onSuccess).to.have.been.called;
   }));
+
+  it('should throw if there is no onError function when simulate is a function', function () {
+    expect(optimisticUpdateWithoutOnError.bind(store)).to.throw;
+  });
 
   it('should call the simulate handler if present', test(function () {
     const simulate = this.spy();

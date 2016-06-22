@@ -1,3 +1,11 @@
+v2.0.0
+Middleware changes:
+* middleware requires either a simulate object with `type` and `data` or a `simulate` function
+* `simulate` denotes the optimistic middleware to run
+* dispatches without `stateKey` will throw
+* `simulate` functions without corresponding `onError` functions will throw
+* `onError` functions arguments have changed. `prevState` is now the last argument.
+
 v1.0.0
 
 Middleware will change quite a bit. Here are the API changes:

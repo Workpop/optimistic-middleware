@@ -43,8 +43,10 @@ function todos(state = {}, action = {}) {
 ```js
 function optimisticAddTodo(text) {
     return {
-        type: 'ADD_TODO',
-        data: text,
+        simulate: {
+            type: 'ADD_TODO',
+            data: text,
+        },
         stateKey: 'todos',
         async(cb) {
             return Meteor.call('addTodo', text, cb);
@@ -60,8 +62,6 @@ the simulate function will allow you to customize your simulations.
 ```js
 function optimisticAddTodo(text) {
     return {
-        type: 'ADD_TODO',
-        data: text,
         simulate(dispatch, data) {
             dispatch({
                type: 'ADD_TODO_ID',
@@ -85,8 +85,10 @@ function optimisticAddTodo(text) {
 ```js
 function optimisticAddTodo(text) {
     return {
-        type: 'ADD_TODO',
-        data: text,
+        simulate: {
+            type: 'ADD_TODO',
+            data: text,
+        },
         onError(dispatch, prevState, error) {
             if (error.reason === 'you suck') {
                 dispatch({
@@ -125,11 +127,13 @@ function someThunk(result) {
 }
 function optimisticAddTodo(text) {
     return {
-        type: 'ADD_TODO',
-        data: text,
+        simulate: {
+            type: 'ADD_TODO',
+            data: text,
+        },
         onSuccess(dispatch, result) {
             dispatch(someThunk(result));
-        }
+        },
         stateKey: 'todos',
         async(cb) {
             return Meteor.call('addTodo', text, cb);
@@ -143,22 +147,34 @@ Let's break down our action shape:
 
 ```js
 type OptimisticActionType = {
-    type: string,
-    stateKey: string,
+    simulate: {
+        type: string,
+        data: any
+    }
+    stateKey: !string,
     async: Function,
-    data: any
+    onError: ?Function,
+    onSuccess: ?Function,
+}
+```
+
+```js
+type OptimisticActionSimulateFuncType = {
+    simulate: Function
+    stateKey: !string,
+    async: Function,
+    onError: ?Function,
+    onSuccess: ?Function,
 }
 ```
 
 Parameters:
 
-1. `[type] - action type corresponding to reducer state change`
+1. `[simulate] - object or function to handle simulation. type/data if object, if function  dispatch, data`
 2. `[stateKey] - key of reducer related to action`
 3. `[async] - asynchronous function intended to make mutation/remote call to the server`
-4. `[data] - data needed to change the state in the reducer`
-5. `[onSuccess] - function to be called when async function returns *optional`
-6. `[simulate] - function be called to simulate the optimistic update *optional`
-7. `[onError] - function to be called when the async function returns an error *optional`
+4. `[onSuccess] - function to be called when async function returns *optional`
+6. `[onError] - function to be called when the async function returns an error *optional`
 
 
 ## How this works:

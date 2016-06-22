@@ -39,18 +39,105 @@ function todos(state = {}, action = {}) {
 
 ### Step 2: Build your Action Creator
 
+#### Generic Optimistic Action Creator
 ```js
 function optimisticAddTodo(text) {
     return {
         type: 'ADD_TODO',
+        data: text,
         stateKey: 'todos',
-        mutation(cb) {
+        async(cb) {
             return Meteor.call('addTodo', text, cb);
-        },
-        data: text
+        }
+    }
+}
+
+```
+
+#### Functional Simulation
+the simulate function will allow you to customize your simulations.
+
+```js
+function optimisticAddTodo(text) {
+    return {
+        type: 'ADD_TODO',
+        data: text,
+        simulate(dispatch, data) {
+            dispatch({
+               type: 'ADD_TODO_ID',
+               data: _.get(data, '_id');
+            });
+            return dispatch({
+                type: 'ALL_TODOS',
+                data
+            });
+        }
+        stateKey: 'todos',
+        async(cb) {
+            return Meteor.call('addTodo', text, cb);
+        }
     }
 }
 ```
+
+#### Custom Errors
+
+```js
+function optimisticAddTodo(text) {
+    return {
+        type: 'ADD_TODO',
+        data: text,
+        onError(dispatch, prevState, error) {
+            if (error.reason === 'you suck') {
+                dispatch({
+                    type: 'TODO_ERROR',
+                    data: error.reason
+                }); 
+            }
+            
+            return dispatch({
+                type: 'ADD_TODO',
+                data: prevState
+            });
+        }
+        stateKey: 'todos',
+        async(cb) {
+            return Meteor.call('addTodo', text, cb);
+        }
+    }
+}
+```
+
+#### Custom onSuccess
+```js
+function someThunk(result) {
+    return (dispatch) => {
+        someOtherAsync(result,(e, result) => {
+            if (e) {
+                console.error('ERROR');
+            }
+            dispatch({
+                type: 'TOGGLE_TODO_LIST',
+                data: result
+            });
+        });
+    }
+}
+function optimisticAddTodo(text) {
+    return {
+        type: 'ADD_TODO',
+        data: text,
+        onSuccess(dispatch, result) {
+            dispatch(someThunk(result));
+        }
+        stateKey: 'todos',
+        async(cb) {
+            return Meteor.call('addTodo', text, cb);
+        }
+    }
+}
+```
+
 
 Let's break down our action shape:
 
@@ -58,7 +145,7 @@ Let's break down our action shape:
 type OptimisticActionType = {
     type: string,
     stateKey: string,
-    mutation: Function,
+    async: Function,
     data: any
 }
 ```
@@ -67,29 +154,28 @@ Parameters:
 
 1. `[type] - action type corresponding to reducer state change`
 2. `[stateKey] - key of reducer related to action`
-3. `[mutation] - asynchronous function intended to mutate some data on the server`
+3. `[async] - asynchronous function intended to make mutation/remote call to the server`
 4. `[data] - data needed to change the state in the reducer`
+5. `[onSuccess] - function to be called when async function returns *optional`
+6. `[simulate] - function be called to simulate the optimistic update *optional`
+7. `[onError] - function to be called when the async function returns an error *optional`
+
 
 ## How this works:
 
 When you dispatch an OptimisticAction, the action is intercepted by Redux middleware. Immediately we save the previous state of the passed in `stateKey` in case our action throws an error. 
 
-We start the dispatch process immediately executing the data change in the action to the reducer. The state is appended with `OPTIMISTIC_UPDATE_START`, to signal the start of our dispatch.
-
+We start the dispatch process immediately executing the data change in the action to the reducer.
 From there, we call our asynchronous method. 
 
-If the method returns an error, we append several pieces of meta data with the error reason and `OPTIMISTIC_UPDATE_FAILURE` (helpful for development).
+If the method returns an error, we append several pieces of meta data with the error reason.
 
  ```js
  type OptimisticErrorType = {
-    error: string,
     data: any
-    optimisticState: string,
     type: string
  }
  ```
-If successful, we append `OPTIMISTIC_UPDATE_SUCCESS` and finish the dispatch process.
-
 ## Caveats
 
 Because we are reverting our state when errors occur based on the reducer state, this middleware is confined to the reducer `stateKey` passed into the action. Optimistic Middleware does not currently support updates that affect multiple stateKeys.

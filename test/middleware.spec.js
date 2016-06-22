@@ -6,9 +6,10 @@ const partial = require('lodash.partial');
 
 function optimisticUpdate(store) {
   return store.dispatch({
+    optimistic: true,
     type: 'UPDATE',
     stateKey: 'test',
-    mutation(cb) {
+    async(cb) {
       return cb();
     },
     data: 'FOO',
@@ -17,9 +18,10 @@ function optimisticUpdate(store) {
 
 function optimisticUpdateWithSuccess(store, onSuccess) {
   return store.dispatch({
+    optimistic: true,
     type: 'UPDATE',
     stateKey: 'test',
-    mutation(cb) {
+    async(cb) {
       return cb();
     },
     data: 'FOO',
@@ -28,10 +30,15 @@ function optimisticUpdateWithSuccess(store, onSuccess) {
 }
 
 function optimisticFail(store) {
+  store.dispatch({
+    type: 'UPDATE',
+    data: 'BAR',
+  });
   return store.dispatch({
     type: 'UPDATE',
+    optimistic: true,
     stateKey: 'test',
-    mutation(cb) {
+    async(cb) {
       const partialCb = partial(cb, { reason: 'you suck' });
       return partialCb();
     },
@@ -39,16 +46,17 @@ function optimisticFail(store) {
   });
 }
 
-function optimisticFailWithErrorType(store) {
+function optimisticSimulation(store, simulate) {
   return store.dispatch({
-    errorType: 'ERROR',
     type: 'UPDATE',
+    data: 'FOO',
+    optimistic: true,
+    simulate,
     stateKey: 'test',
-    mutation(cb) {
+    async(cb) {
       const partialCb = partial(cb, { reason: 'you suck' });
       return partialCb();
     },
-    data: 'FOO',
   });
 }
 
@@ -56,7 +64,8 @@ function optimisticFailWithError(store, onError) {
   return store.dispatch({
     type: 'UPDATE',
     stateKey: 'test',
-    mutation(cb) {
+    optimistic: true,
+    async(cb) {
       const partialCb = partial(cb, { reason: 'you suck' });
       return partialCb();
     },
@@ -70,11 +79,6 @@ function testReducer(state = { data: 'BAR' }, action = {}) {
   if (type === 'UPDATE') {
     return {
       data,
-      ...rest,
-    };
-  } else if (type === 'ERROR') {
-    return {
-      data: 'ERROR',
       ...rest,
     };
   }
@@ -91,33 +95,30 @@ describe('Optimistic Middleware', function () {
   beforeEach(function () {
     store = createStore(rootReducer, {}, applyMiddleware(optimisticMiddleware));
   });
-  it('should apply the update with an Optimistc flag', function () {
+
+
+  it('should apply the update optimistically', function () {
     optimisticUpdate(store);
-    expect(store.getState().test.optimisticState).to.eql('OPTIMISTIC_UPDATE_SUCCESS');
     expect(store.getState().test.data).to.eql('FOO');
   });
-  it('should not update state and have a failed optimistic state', function () {
+  it('should not update state if method fails', function () {
     optimisticFail(store);
-    expect(store.getState().test.optimisticState).to.eql('OPTIMISTIC_UPDATE_FAILURE');
     expect(store.getState().test.data).to.eql('BAR');
   });
+  it('should call the onError handler if present when update is successful', test(function () {
+    const simulate = this.spy();
+    optimisticSimulation(store, simulate);
+    expect(simulate).to.have.been.called;
+  }));
   it('should call the onSuccess handler if present when update is successful', test(function () {
     const onSuccess = this.spy();
     optimisticUpdateWithSuccess(store, onSuccess);
-    expect(store.getState().test.optimisticState).to.eql('OPTIMISTIC_UPDATE_SUCCESS');
     expect(onSuccess).to.have.been.called;
   }));
 
-  it('should call the onError handler if present when update is successful', test(function () {
-    const onError = this.spy();
-    optimisticFailWithError(store, onError);
-    expect(store.getState().test.optimisticState).to.eql('OPTIMISTIC_UPDATE_FAILURE');
-    expect(onError).to.have.been.called;
+  it('should call the simulate handler if present', test(function () {
+    const simulate = this.spy();
+    optimisticFailWithError(store, simulate);
+    expect(simulate).to.have.been.called;
   }));
-
-  it('should update the store differently if an errorType is passed in', function () {
-    optimisticFailWithErrorType(store);
-    expect(store.getState().test.optimisticState).to.eql('OPTIMISTIC_UPDATE_FAILURE');
-    expect(store.getState().test.data).to.eql('ERROR');
-  });
 });

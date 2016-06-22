@@ -4,7 +4,7 @@ Middleware changes:
 * `simulate` denotes the optimistic middleware to run
 * dispatches without `stateKey` will throw
 * `simulate` functions without corresponding `onError` functions will throw
-
+* `onError` functions arguments have changed. `prevState` is now the last argument.
 
 v1.0.0
 
